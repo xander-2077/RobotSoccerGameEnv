@@ -1,6 +1,7 @@
 # -*-coding:utf-8-*-
 # author: Xander
 # 4 EP robots act the same actions
+import time
 
 from CoppeliaSim import sim
 import sys
@@ -46,12 +47,13 @@ if __name__ == '__main__':
         print("Connection not successful!")
         sys.exit("Could not connect")
 
-    returnCode, EP_A0_handle = sim.simxGetObjectHandle(clientID, "/EP_A0", sim.simx_opmode_oneshot_wait)
-    returnCode, position = sim.simxGetObjectPosition(clientID, EP_A0_handle, -1, sim.simx_opmode_streaming)
-    returnCode, position = sim.simxGetObjectPosition(clientID, EP_A0_handle, -1, sim.simx_opmode_buffer)
-    print(returnCode)
-    print(position)
-
+    res, EP_A0_handle = sim.simxGetObjectHandle(clientID, "/EP_A0", sim.simx_opmode_oneshot_wait)
+    res, position = sim.simxGetObjectPosition(clientID, EP_A0_handle, -1, sim.simx_opmode_streaming)
+    while sim.simxGetConnectionId(clientID) != -1:
+        res, position = sim.simxGetObjectPosition(clientID, EP_A0_handle, -1, sim.simx_opmode_buffer)
+        if res == sim.simx_return_ok:
+            print(position)
+        time.sleep(0.5)
 
 
     # # Init Config
