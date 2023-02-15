@@ -7,6 +7,7 @@ Refer to `Installation` and `Build` part of [robomaster_sim](https://github.com/
 ### Install Python Packages
 Refer to [Robomaster SDK](https://github.com/jeguzzi/robomaster_ros#robomaster-sdk). A virtual environment `venv` is 
 recommended (Anaconda is not recommended).
+We modified a few code and you could just pull this repo.
 
 
 
