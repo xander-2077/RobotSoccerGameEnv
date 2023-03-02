@@ -38,7 +38,14 @@ end
 simRemoteApi.start(19999)
 ```
 6. Press PLAY in CoppeliaSim.
-7. Run the python script `simpleTest.py` in CoppeliaSim folder to test if everything is fine.
+7. Try this to test if everything in CoppeliaSim is fine.
+```lua
+simRobomaster.set_target_twist(0, {x=0.2, y=-0.1, theta=0.1});
+simRobomaster.set_target_twist(1, {y=0.2, theta=-0.1});
+simRobomaster.set_target_twist(2, {x=0.2, y=-0.12});
+simRobomaster.set_target_twist(3, {x=0.2, y=0.1})
+```
+8. Run the python script `simpleTest.py` in CoppeliaSim folder to test if everything is fine.
 
 
 ## CoppeliaSim remote API

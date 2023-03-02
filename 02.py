@@ -31,8 +31,8 @@ def main():
         print("Connection not successful!")
         sys.exit("Could not connect")
 
-    # single_robot()
-    multiple_robot()
+    single_robot()
+    # multiple_robot()
 
 
 def single_robot():

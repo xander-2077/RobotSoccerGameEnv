@@ -47,33 +47,34 @@ if __name__ == '__main__':
         print("Connection not successful!")
         sys.exit("Could not connect")
 
-    res, EP_A0_handle = sim.simxGetObjectHandle(clientID, "/EP_A0", sim.simx_opmode_oneshot_wait)
-    res, position = sim.simxGetObjectPosition(clientID, EP_A0_handle, -1, sim.simx_opmode_streaming)
-    while sim.simxGetConnectionId(clientID) != -1:
-        res, position = sim.simxGetObjectPosition(clientID, EP_A0_handle, -1, sim.simx_opmode_buffer)
-        if res == sim.simx_return_ok:
-            print(position)
-        time.sleep(0.5)
+    # res, EP_A0_handle = sim.simxGetObjectHandle(clientID, "/EP_A0", sim.simx_opmode_oneshot_wait)
+    # res, position = sim.simxGetObjectPosition(clientID, EP_A0_handle, -1, sim.simx_opmode_streaming)
+    # while sim.simxGetConnectionId(clientID) != -1:
+    #     res, position = sim.simxGetObjectPosition(clientID, EP_A0_handle, -1, sim.simx_opmode_buffer)
+    #     if res == sim.simx_return_ok:
+    #         print(position)
+    #     time.sleep(0.5)
 
 
-    # # Init Config
-    # robots_sn_list = ['3JKDH2T00159G8', '3JKCJC400302GS', '3JKCJC400301ZP', '3JKCJC400301UD']
-    #
-    # multi_robots = multi_robot.MultiEP()
-    # multi_robots.initialize()
-    #
-    # # Modified
-    # number = multi_robots.number_id_by_sn(robots_sn_list, [1, robots_sn_list[0]], [2, robots_sn_list[1]],
-    #                                       [3, robots_sn_list[2]], [4, robots_sn_list[3]])
-    # print("The number of robot is: {0}".format(number))
-    #
-    # robot_group_all = multi_robots.build_group([1, 2, 3, 4])
+    # Init Config
+    robots_sn_list = ['3JKDH2T00159G8', '3JKCJC400302GS', '3JKCJC400301ZP', '3JKCJC400301UD']
+
+    multi_robots = multi_robot.MultiEP()
+    multi_robots.initialize()
+
+    # Modified
+    number = multi_robots.number_id_by_sn(robots_sn_list, [1, robots_sn_list[0]], [2, robots_sn_list[1]],
+                                          [3, robots_sn_list[2]], [4, robots_sn_list[3]])
+    print("The number of robot is: {0}".format(number))
+
+    robot_group_all = multi_robots.build_group([1, 2, 3, 4])
     # robot_group_1 = multi_robots.build_group([1, 2])
     # robot_group_2 = multi_robots.build_group([3, 4])
     # robot_group_3 = multi_robots.build_group([1, 3])
     # robot_group_4 = multi_robots.build_group([4])
     # robot_group_5 = multi_robots.build_group([1, 2, 3])
-    #
-    # multi_robots.run([robot_group_all, group_task])
-    # print("Game over")
-    # multi_robots.close()
+
+    multi_robots.run([robot_group_all, group_task])
+
+    print("Game over")
+    multi_robots.close()

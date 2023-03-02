@@ -1,6 +1,8 @@
 import os
 import time
+import sys
 import threading
+from queue import Queue
 from CoppeliaSim import sim
 
 
