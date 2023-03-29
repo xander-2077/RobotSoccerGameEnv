@@ -53,10 +53,11 @@ simRobomaster.set_gripper_target(int handle, string state, float power=0.5)
 ```
 8. Run the python script `simpleTest.py` in CoppeliaSim folder to test if everything is fine.
 
-## CoppeliaSim remote API
-https://www.coppeliarobotics.com/helpFiles/en/remoteApiFunctionsPython.htm
+## [CoppeliaSim remote API](https://www.coppeliarobotics.com/helpFiles/en/remoteApiFunctionsPython.htm)
 
-## Robomaster API
+Some commonly used functions, see *CoppeliaSim Legacy remote API*.
+
+## RoboMaster API
 https://robomaster-dev.readthedocs.io/zh_CN/latest/index.html
 
 
