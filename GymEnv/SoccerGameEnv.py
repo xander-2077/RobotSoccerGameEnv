@@ -12,11 +12,14 @@ PI = 3.141592654
 
 
 class SoccerGameEnv(gym.Env):
-    def __init__(self):
+    def __init__(self, args):
         super().__init__()
 
-        self.max_episode_step = 100
+        self.args = args
+        self.GUI = self.args.gui
+        self.max_episode_step = self.args.max_episode_step
         self.current_step = 0
+        self.total_steps = 0
         self.alpha = 10
         self.distance = [0., 0.]
 
@@ -53,7 +56,7 @@ class SoccerGameEnv(gym.Env):
                 time.sleep(0.2)
 
         sim.simxStartSimulation(self.clientID, sim.simx_opmode_blocking)
-        sim.simxSetBooleanParameter(self.clientID, sim.sim_boolparam_display_enabled, True, sim.simx_opmode_oneshot)
+        sim.simxSetBooleanParameter(self.clientID, sim.sim_boolparam_display_enabled, self.GUI, sim.simx_opmode_oneshot)
         self.init_sim()
 
     def init_sim(self):
@@ -86,17 +89,18 @@ class SoccerGameEnv(gym.Env):
         return {"distance": distance, "linear_velocity": linear_velocity, "angular_velocity": angular_velocity}
 
     def step(self, action):
-        # sim.simxSetBooleanParameter(self.clientID, sim.sim_boolparam_display_enabled, True, sim.simx_opmode_oneshot)
+        sim.simxSetBooleanParameter(self.clientID, sim.sim_boolparam_display_enabled, self.GUI, sim.simx_opmode_oneshot)
 
         # Pass action to CoppeliaSim
         self.robot.move(action[0] * 3.5, action[1] * 3.5, action[2] * 600)
         self.current_step += 1
+        self.total_steps += 1
 
         # Retrieve obs & info
         observation = self._get_obs()
         info = self._get_info()
         done = False
-        if observation["ball"][1] < -4.125 or self.current_step >= self.max_episode_step: # or observation['robot']:
+        if observation["ball"][1] < -4.125 or self.current_step >= self.max_episode_step:  # or observation['robot']:
             done = True
 
         # Calculate Reward
@@ -107,6 +111,7 @@ class SoccerGameEnv(gym.Env):
             reward += -1
 
         print("-----------------------------")
+        print("total step: {} / {}".format(self.current_step, self.args.max_episode_step))
         print("current step: {}".format(self.current_step))
         print("obs: {}".format(observation))
         print("info: {}".format(info))
@@ -116,11 +121,18 @@ class SoccerGameEnv(gym.Env):
         return observation, reward, done, info
 
     def reset(self):
-        sim.simxStopSimulation(self.clientID, sim.simx_opmode_blocking)
-        time.sleep(4)
-        sim.simxStartSimulation(self.clientID, sim.simx_opmode_blocking)
+        # sim.simxStopSimulation(self.clientID, sim.simx_opmode_blocking)
+        # time.sleep(4)
+        # sim.simxStartSimulation(self.clientID, sim.simx_opmode_blocking)
+        # self.init_sim()
 
-        self.init_sim()
+        if self.args.random_initial_state:
+            self.robot.random_initial_robot()
+        else:
+            sim.simxSetObjectPosition(self.clientID, self.ball_handle, -1, (-1.925, -1., 0.11), sim.simx_opmode_oneshot)
+            sim.simxSetObjectPosition(self.clientID, self.robot.handle, -1, (-1.925, 1, 0.0674), sim.simx_opmode_oneshot)
+
+        sim.simxSetObjectOrientation(self.clientID, self.robot.handle, -1, (-PI/2, 0, -PI/2), sim.simx_opmode_oneshot)
 
         self.current_step = 0
         _, self.distance[0] = sim.simxCheckDistance(self.clientID, self.robot.clientID, self.ball_handle,

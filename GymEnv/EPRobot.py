@@ -1,5 +1,6 @@
 from robomaster import robot as rmrobot
 import numpy as np
+import random
 import time
 import logging
 from CoppeliaSim import sim
@@ -34,9 +35,9 @@ class EP_Robot:
         self.chassis.drive_speed(x=x, y=y, z=z, timeout=t_interval)
         time.sleep(t_interval)  # TODO: need to change
 
-    # def random_set_robot_position(self):
-    #     sim.simxSetObjectPosition(self.clientID, self.handle, self.handle, (0, random.uniform(-1, 1), 0), sim.simx_opmode_oneshot)
-    #     sim.simxSetObjectOrientation(self.clientID, self.handle, self.handle, (PI / 2, 0, 0), sim.simx_opmode_oneshot)
+    def random_initial_robot(self):
+        sim.simxSetObjectPosition(self.clientID, self.handle, self.handle, (0, random.uniform(-1, 1), 0), sim.simx_opmode_oneshot)
+        sim.simxSetObjectOrientation(self.clientID, self.handle, self.handle, (PI / 2, 0, 0), sim.simx_opmode_oneshot)
 
     def get_pos(self):
         while all(
