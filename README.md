@@ -50,7 +50,7 @@ I tested on the below environment.
 ```
 2. Open simulation scene `1_EP_Shot.ttt`.
 
-   ![image-20230329204649441](pic/image-20230329204649441.png)
+   ![image-20230329204649441](assets/image-20230329204649441.png)
 
 3. IP alias
 ```shell

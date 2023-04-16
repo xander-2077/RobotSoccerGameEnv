@@ -4,7 +4,10 @@ import numpy as np
 import logging
 import time
 from CoppeliaSim import sim
-from EPRobot import EP_Robot
+
+import sys
+sys.path.append("../..")
+from GymEnv.EPRobot import EP_Robot
 
 logging.basicConfig(level=logging.INFO)
 gym.logger.set_level(40)
@@ -17,7 +20,7 @@ class SoccerGameEnv(gym.Env):
 
         self.args = args
         self.GUI = self.args.gui
-        self.max_episode_step = self.args.max_episode_step
+        self._max_episode_steps = self.args.max_episode_step
         self.current_step = 0
         self.total_steps = 0
         self.alpha = 10
@@ -27,17 +30,18 @@ class SoccerGameEnv(gym.Env):
         self.ball_handle = None
         self.clientID = None
 
-        self.observation_space = spaces.Dict(
-            {
-                'robot': spaces.Box(low=-5.,
-                                    high=5.,
-                                    shape=(3,),
-                                    dtype=np.float16),  # TODO: change low & high
-                'ball': spaces.Box(low=-5.,
-                                   high=5.,
-                                   shape=(2,),
-                                   dtype=np.float16)
-            })
+        # self.observation_space = spaces.Dict(
+        #     {
+        #         'robot': spaces.Box(low=-5.,
+        #                             high=5.,
+        #                             shape=(3,),
+        #                             dtype=np.float16),  # TODO: change low & high
+        #         'ball': spaces.Box(low=-5.,
+        #                            high=5.,
+        #                            shape=(2,),
+        #                            dtype=np.float16)
+        #     })
+        self.observation_space = spaces.Box(low=-5., high=5., shape=(5,), dtype=np.float16)
         self.action_space = spaces.Box(
             low=np.array([-1, -1, -1]),
             high=np.array([1, 1, 1]),
@@ -69,11 +73,15 @@ class SoccerGameEnv(gym.Env):
         self.robot = EP_Robot(self.clientID, self.ball_handle)
 
     def _get_obs(self):
-        return {"robot": np.hstack((self.robot.get_pos(), self.robot.get_ori())).astype('float16'),
-                "ball": np.array(
-                    sim.simxGetObjectPosition(self.clientID, self.ball_handle, -1, sim.simx_opmode_buffer)[1],
-                    dtype='float16')[:-1]
-                }
+        # return {"robot": np.hstack((self.robot.get_pos(), self.robot.get_ori())).astype('float16'),
+        #         "ball": np.array(
+        #             sim.simxGetObjectPosition(self.clientID, self.ball_handle, -1, sim.simx_opmode_buffer)[1],
+        #             dtype='float16')[:-1]
+        #         }
+        return np.concatenate((np.hstack((self.robot.get_pos(), self.robot.get_ori())).astype('float16'),
+                               np.array(sim.simxGetObjectPosition(self.clientID, self.ball_handle, -1,
+                                                                  sim.simx_opmode_buffer)[1],
+                                        dtype='float16')[:-1]))
 
     def _get_info(self):
         # Check if collision
@@ -100,18 +108,18 @@ class SoccerGameEnv(gym.Env):
         observation = self._get_obs()
         info = self._get_info()
         done = False
-        if observation["ball"][1] < -4.125 or self.current_step >= self.max_episode_step:  # or observation['robot']:
+        if observation[3] < -4.125 or self.current_step >= self._max_episode_steps:  # or observation['robot']:
             done = True
 
         # Calculate Reward
         reward = 100 if done else -1
         self.distance[1] = info["distance"]
         reward += self.alpha * (self.distance[0] - self.distance[1])
-        if not (-3.575 < observation["robot"][1] < 1.55 and -3.7 < observation["robot"][0] < -0.3):
+        if not (-3.575 < observation[1] < 1.55 and -3.7 < observation[0] < -0.3):
             reward += -1
 
         print("-----------------------------")
-        print("total step: {} / {}".format(self.current_step, self.args.max_episode_step))
+        # print("total step: {} / {}".format(self.current_step, self.))
         print("current step: {}".format(self.current_step))
         print("obs: {}".format(observation))
         print("info: {}".format(info))
@@ -130,9 +138,11 @@ class SoccerGameEnv(gym.Env):
             self.robot.random_initial_robot()
         else:
             sim.simxSetObjectPosition(self.clientID, self.ball_handle, -1, (-1.925, -1., 0.11), sim.simx_opmode_oneshot)
-            sim.simxSetObjectPosition(self.clientID, self.robot.handle, -1, (-1.925, 1, 0.0674), sim.simx_opmode_oneshot)
+            sim.simxSetObjectPosition(self.clientID, self.robot.handle, -1, (-1.925, 1, 0.0674),
+                                      sim.simx_opmode_oneshot)
 
-        sim.simxSetObjectOrientation(self.clientID, self.robot.handle, -1, (-PI/2, 0, -PI/2), sim.simx_opmode_oneshot)
+        sim.simxSetObjectOrientation(self.clientID, self.robot.handle, -1, (-PI / 2, 0, -PI / 2),
+                                     sim.simx_opmode_oneshot)
 
         self.current_step = 0
         _, self.distance[0] = sim.simxCheckDistance(self.clientID, self.robot.clientID, self.ball_handle,

@@ -11,7 +11,7 @@ if __name__ == '__main__':
     # check_env(env)
     # t1 = time.time()
     # model = A2C("MultiInputPolicy", env, verbose=1).learn(total_timesteps=500)
-    model = PPO("MultiInputPolicy", env, verbose=1)
+    model = PPO("MlpPolicy", env, verbose=1)
     model.learn(args.total_timestep)
     model.save("ppo_rsge")
 
